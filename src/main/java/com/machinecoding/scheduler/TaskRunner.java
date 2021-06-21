@@ -3,6 +3,7 @@ package com.machinecoding.scheduler;
 import java.util.Date;
 import java.util.PriorityQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -40,6 +41,11 @@ public class TaskRunner implements Runnable {
                 consumeLock.lock();
                 while (queue.size() == 0) {
                     condition.await();
+                }
+
+                while (queue.peek().getScheduleTime() > new Date().getTime()) {
+                    condition.await(Math.max(0, queue.peek().getScheduleTime() - (new Date().getTime())),
+                            TimeUnit.MILLISECONDS);
                 }
                 consumeLock.unlock();
 
