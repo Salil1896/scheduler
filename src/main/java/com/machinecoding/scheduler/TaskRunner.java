@@ -51,15 +51,10 @@ public class TaskRunner implements Runnable {
 
                 prodSem.acquire();
                 MyRunnable task = queue.peek();
-                if (task.getScheduleTime() < new Date().getTime()) {
-                    queue.poll();
-
-                    //TODO use thread from thread pool
-                    Thread thread = new Thread(task);
-                    thread.start();
-                } else {
-                    threadLimitSem.release();
-                }
+                queue.poll();
+                Thread thread = new Thread(task);
+                thread.start();
+                // use thread pool buffer to reuse thread
                 prodSem.release();
 
             }
